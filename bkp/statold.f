@@ -588,6 +588,7 @@ allocate( cost(size(trj)) , source = 0.d0)
 ! this algorithm does the same thing twice as fast but it is twice as unclear ...
 cost = 0.d0
 !$omp parallel do schedule(dynamic,300) default(shared) private(i1,i2,j,k,soma)
+
 do i1 = 1 , size(trj)
     do i2 = 1 , size(trj)
     if(i1/=i2) then
@@ -602,7 +603,8 @@ do i1 = 1 , size(trj)
         cost(i1) = cost(i1) + soma
     end if
     end do
-end do    
+ end do
+ 
 !$omp end parallel do
 !============================================================================================
 
@@ -612,7 +614,7 @@ write(*,'(/a,I5)') ' Most Representative Configuration is MODEL = ', typical, ' 
 
 write(*,'(/a)') ' >>>  Saving RMSD.dat ' 
 
-OPEN(unit=9,file='RMSDfst.dat',status='unknown')
+OPEN(unit=9,file='RMSD.dat',status='unknown')
 do i = 1 , size(trj)
     write(9,*) i , cost(i)
 end do

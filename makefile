@@ -27,7 +27,7 @@ SOURCE = types_m.o \
 		 solvent.o \
 		 elastic.o \
 		 correlation.o \
-		 stat.o \
+		 statslw.o \
 		 trj.o \
 		 multiple_trj.o \
 		 occupation_bin.o \

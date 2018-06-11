@@ -576,34 +576,39 @@ end do
 
 allocate( cost(size(trj)) , source = 0.d0)
 !============================================================================================
-! most representative configuration has the lowest cost ... 
-!do i1 = 1 , size(trj)
-!    do i2 = 1 , size(trj)
-!        If( i1 /= i2 ) cost(i1) = cost(i1) + sum( (xyz(i1,:,:)-xyz(i2,:,:)) * (xyz(i1,:,:)-xyz(i2,:,:)) , mask )
-!    end do
-!end do
+
+
+!most representative configuration has the lowest cost ...
+cost = 0.d0
+write(*,*) "Hi, I'm Here!"
+do i1 = 1 , size(trj)
+   do i2 = 1 , size(trj)
+       If( i1 /= i2 ) cost(i1) = cost(i1) + sum( (xyz(i1,:,:)-xyz(i2,:,:)) * (xyz(i1,:,:)-xyz(i2,:,:)) , mask )
+   end do
+end do
+write (*,*) "Hi, I'm now out of looop"
 
 !------------------------
 
 ! this algorithm does the same thing twice as fast but it is twice as unclear ...
-cost = 0.d0
-!$omp parallel do schedule(dynamic,300) default(shared) private(i1,i2,j,k,soma)
-do i1 = 1 , size(trj)
-    do i2 = 1 , size(trj)
-    if(i1/=i2) then
-        soma = 0.d0
-        do j = 1 , trj(1)%N_of_atoms
-        do k = 1 , 3
+!cost = 0.d0
+! !$omp parallel do schedule(dynamic,300) default(shared) private(i1,i2,j,k,soma)
+! do i1 = 1 , size(trj)
+!     do i2 = 1 , size(trj)
+!     if(i1/=i2) then
+!         soma = 0.d0
+!         do j = 1 , trj(1)%N_of_atoms
+!         do k = 1 , 3
 
-            If( mask(j,k) ) soma = soma + (xyz(i1,j,k) - xyz(i2,j,k))*(xyz(i1,j,k) - xyz(i2,j,k))
+!             If( mask(j,k) ) soma = soma + (xyz(i1,j,k) - xyz(i2,j,k))*(xyz(i1,j,k) - xyz(i2,j,k))
 
-        end do
-        end do
-        cost(i1) = cost(i1) + soma
-    end if
-    end do
-end do    
-!$omp end parallel do
+!         end do
+!         end do
+!         cost(i1) = cost(i1) + soma
+!     end if
+!     end do
+! end do    
+! !$omp end parallel do
 !============================================================================================
 
 typical = minloc( cost , dim=1 )
@@ -612,7 +617,7 @@ write(*,'(/a,I5)') ' Most Representative Configuration is MODEL = ', typical, ' 
 
 write(*,'(/a)') ' >>>  Saving RMSD.dat ' 
 
-OPEN(unit=9,file='RMSDfst.dat',status='unknown')
+OPEN(unit=9,file='RMSDslw.dat',status='unknown')
 do i = 1 , size(trj)
     write(9,*) i , cost(i)
 end do
