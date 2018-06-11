@@ -577,6 +577,7 @@ end do
 allocate( cost(size(trj)) , source = 0.d0)
 !============================================================================================
 
+write(*,*) mask(1:10, 1:10)
 
 !most representative configuration has the lowest cost ...
 cost = 0.d0
