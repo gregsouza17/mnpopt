@@ -585,11 +585,31 @@ allocate( cost(size(trj)) , source = 0.d0)
 
 !most representative configuration has the lowest cost ...
 
-write(*,*) mask(1:10, 1:3)
 
-call Cslwcost(trj(1)%N_of_atoms, mask)
+!! Testing if Mask, xyz and cost is being correctly passed to the C module
 
 cost = 0.d0
+
+cost(2) = 2.d0
+cost(3) = 3.d0
+cost(7) = 7.d0
+cost(13) = 13.d0
+
+open(unit=17, file = './tst/maksFtst.dat', status='unknown')
+do i1= 1, size(trj)
+   write(17,*) i1, " : ",cost(i1)
+   
+end do
+
+
+!! -----
+
+
+
+call Cslwcost(trj(1)%N_of_atoms, size(trj), mask(1:trj(1)%N_of_atoms, 1:3),&
+     & xyz, cost)
+
+
 do i1 = 1 , size(trj)
    do i2 = 1 , size(trj)
        If( i1 /= i2 ) cost(i1) = cost(i1) + sum( (xyz(i1,:,:)-xyz(i2,:,:)) * (xyz(i1,:,:)-xyz(i2,:,:)) , mask )
