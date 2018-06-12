@@ -1,9 +1,10 @@
 #
 
 SUFFIX=.f
-
+CFIX=.c
 #FC=/opt/intel/composer_xe_2015.1.133/bin/intel64/ifort
 FC = ifort
+CFC= nvcc
 SAFE = -g -traceback
 FFLAGS = -xhost -qopenmp -fpp -O3 -free $(SAFE)
 
@@ -34,15 +35,28 @@ SOURCE = types_m.o \
                  aminoacids.o \
 		 edview.o
 
-a: $(SOURCE)  
+CSOURCE = Ccostslow.o
+
+a: $(CSOURCE) $(SOURCE)  
 	rm -f a
-	$(FC) $(INCS) -o a $(SOURCE) $(LIB) 
+	$(FC) $(INCS) -o a $(SOURCE) $(CSOURCE) $(LIB) 
 	-rm -f *.log
-.f.o:
+
+
+
+.f.o: $(CSOURCE)
 	$(FC) $(FFLAGS) $(INCS) -c $*$(SUFFIX)
+
+
+.c.o:
+	@echo "!!!Compilling the C Stuff!!!"
+	$(CFC) -c $*$(CFIX)
+
+
 
 fcv:
 	$(FC) -v
-
+ccv:
+	$(CFC) -V	
 clean: 
 	-rm -f *.o *.mod; touch *.f *~
