@@ -1,15 +1,19 @@
 #
 
 SUFFIX=.f
-CFIX=.c
+
 #FC=/opt/intel/composer_xe_2015.1.133/bin/intel64/ifort
 FC = ifort
-CFC= nvcc
 SAFE = -g -traceback
 FFLAGS = -xhost -qopenmp -fpp -O3 -free $(SAFE)
 
 LIB    =  -liomp5
 INCS   = 
+
+CFIX=.c
+CFC= nvcc
+
+CFLAGS = -O2
 
 #-----------------------------------------------------------------------
 # general rules
@@ -49,8 +53,7 @@ a: $(CSOURCE) $(SOURCE)
 
 
 .c.o:
-	@echo "!!!Compilling the C Stuff!!!"
-	$(CFC) -c $*$(CFIX)
+	$(CFC) -c $(CFLAGS) $*$(CFIX)
 
 
 

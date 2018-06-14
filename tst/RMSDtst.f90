@@ -17,14 +17,14 @@ program RMSDtst
   integer :: iwrong
 
   !Reads Cost Fast =================================
-  open(1,FILE = 'RMSDfst.dat', status='old', action = 'read')
+  open(1,FILE = 'Fcostfast.dat', status='old', action = 'read')
   read(1,*) temp
   
   costfst = temp(2,:)
   !==================================================
   
   !Reads Cost Slow =================================
-  open(2, FILE= 'RMSDslw.dat', status='old', action= 'read')
+  open(2, FILE= 'Ccostcpu.dat', status='old', action= 'read')
   read(2,*) temp
 
   costslw = temp(2,:)

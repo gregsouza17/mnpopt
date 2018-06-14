@@ -1,0 +1,19 @@
+ Total C time elapsed:   339.496997000000     
+ Loop C time elapsed (nvcc -c):   339.496335000000     
+ Fortran Loop Time:    24.8074270000000     
+ --- O tempo de passar os dados para C nao justifica a demora!!! 
+
+Total C time elapsed:   326.581018000000     
+ Loop C time elapsed (nvcc -c -O):   326.580359000000     
+  
+ 
+ 
+ Total C time elapsed:   84.8756780000000     
+ Loop C time elapsed (nvcc -c -O3):   84.8756610000000     
+ 
+ Fortran Loop Time:    24.5357520000000     
+ 
+ Total C time elapsed:   91.3456040000000     
+ Loop C time elapsed (nvcc -c -O2):   91.3455900000000     
+ 
+ Fortran Loop Time:    27.9382140000000     

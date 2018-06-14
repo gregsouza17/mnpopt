@@ -552,11 +552,11 @@ type(universe)                , intent(out)    :: sys
 
 ! local variables ....
 real*8   , allocatable  :: xyz(:,:,:) , cost(:)
-real*8                  :: soma
+real*8                  :: soma, start, finish, ctime
 integer                 :: i , j , k , typical
 character(1)            :: answer
 logical  , allocatable  :: mask(:,:)
-external Cslwcost !C AQUIIIIIIIIIIIIIIIII
+external Cslwcost !CCCCCCCCCCCCCCCCCCCC (Ccost.c or .cu)
 
 
 ! create work matrix to emulate trj%atom%xyz ...
@@ -585,59 +585,61 @@ allocate( cost(size(trj)) , source = 0.d0)
 
 !most representative configuration has the lowest cost ...
 
-
-!! Testing if Mask, xyz and cost is being correctly passed to the C module
-
-cost = 0.d0
-
-cost(2) = 2.d0
-cost(3) = 3.d0
-cost(7) = 7.d0
-cost(13) = 13.d0
-
-open(unit=17, file = './tst/maksFtst.dat', status='unknown')
-do i1= 1, size(trj)
-   write(17,*) i1, " : ",cost(i1)
-   
-end do
-
-
-!! -----
-
-
-
-call Cslwcost(trj(1)%N_of_atoms, size(trj), mask(1:trj(1)%N_of_atoms, 1:3),&
-     & xyz, cost)
-
-
-do i1 = 1 , size(trj)
-   do i2 = 1 , size(trj)
-       If( i1 /= i2 ) cost(i1) = cost(i1) + sum( (xyz(i1,:,:)-xyz(i2,:,:)) * (xyz(i1,:,:)-xyz(i2,:,:)) , mask )
-   end do
-end do
+!cost = 0.d0
+! do i1 = 1 , size(trj)
+!    do i2 = 1 , size(trj)
+!        If( i1 /= i2 ) cost(i1) = cost(i1) + sum( (xyz(i1,:,:)-xyz(i2,:,:)) * (xyz(i1,:,:)-xyz(i2,:,:)) , mask )
+!    end do
+! end do
 
 
 !------------------------
 
 ! this algorithm does the same thing twice as fast but it is twice as unclear ...
-!cost = 0.d0
+
+open(unit=17, file = './tst/time.dat',position = 'append' , status='unknown')
+
+call cpu_time(start)
+cost = 0.d0
+call Cslwcost(trj(1)%N_of_atoms, size(trj), mask, xyz, cost, ctime)
+call cpu_time(finish)
+write(17,*) ""
+write(17,*) "Total C time elapsed:", (finish-start)
+write(17,*) "Loop C time elapsed (nvcc -c -O2):", ctime
+write(17,*) ""
+
+finish =0; start=0;
+
+
 ! !$omp parallel do schedule(dynamic,300) default(shared) private(i1,i2,j,k,soma)
-! do i1 = 1 , size(trj)
-!     do i2 = 1 , size(trj)
-!     if(i1/=i2) then
-!         soma = 0.d0
-!         do j = 1 , trj(1)%N_of_atoms
-!         do k = 1 , 3
+call cpu_time(start)
+cost = 0.d0
+do i1 = 1 , size(trj)
+    do i2 = 1 , size(trj)
+    if(i1/=i2) then
+        soma = 0.d0
+        do j = 1 , trj(1)%N_of_atoms
+        do k = 1 , 3
 
-!             If( mask(j,k) ) soma = soma + (xyz(i1,j,k) - xyz(i2,j,k))*(xyz(i1,j,k) - xyz(i2,j,k))
+            If( mask(j,k) ) soma = soma + (xyz(i1,j,k) - xyz(i2,j,k))*(xyz(i1,j,k) - xyz(i2,j,k))
 
-!         end do
-!         end do
-!         cost(i1) = cost(i1) + soma
-!     end if
-!     end do
-! end do    
-! !$omp end parallel do
+        end do
+        end do
+        cost(i1) = cost(i1) + soma
+    end if
+    end do
+ end do
+ call cpu_time(finish)
+
+ write(17,*) "Fortran Loop Time: ", (finish - start)
+!!$omp end parallel do
+
+
+
+!do i1= 1, size(trj)
+ !   write(17,*) i1,"   ", cost(i1)
+!end do
+
 !============================================================================================
 
 typical = minloc( cost , dim=1 )
