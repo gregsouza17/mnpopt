@@ -46,6 +46,7 @@ void cslwcost_(int *N_atoms, int *Size_trj, bool mask[3][*N_atoms],
   } //for i1
   t = clock() - t;
   *ctime = (double) t/CLOCKS_PER_SEC;
+
 }
   
   /*

@@ -605,7 +605,7 @@ call Cslwcost(trj(1)%N_of_atoms, size(trj), mask, xyz, cost, ctime)
 call cpu_time(finish)
 write(17,*) ""
 write(17,*) "Total C time elapsed:", (finish-start)
-write(17,*) "Loop C time elapsed (nvcc -c -O2):", ctime
+write(17,*) "Loop C time elapsed (nvcc O3 m64):", ctime
 write(17,*) ""
 
 finish =0; start=0;

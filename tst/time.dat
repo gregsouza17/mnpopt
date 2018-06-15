@@ -17,3 +17,18 @@ Total C time elapsed:   326.581018000000
  Loop C time elapsed (nvcc -c -O2):   91.3455900000000     
  
  Fortran Loop Time:    27.9382140000000     
+ 
+ Total C time elapsed:   96.1414930000000     
+ Loop C time elapsed (gcc -c -O3 +loop opt):   96.1414800000000     
+ 
+ Fortran Loop Time:    28.2741810000000     
+ 
+ Total C time elapsed:   94.2528940000000     
+ Loop C time elapsed (gcc -c -O3 +loop opt 128):   94.2528810000000     
+ 
+ Fortran Loop Time:    29.3794400000000     
+ 
+ Total C time elapsed:   88.9536510000000     
+ Loop C time elapsed (nvcc O3 m64):   88.9536370000000     
+ 
+ Fortran Loop Time:    25.6321860000000     

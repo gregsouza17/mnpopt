@@ -11,9 +11,10 @@ LIB    =  -liomp5
 INCS   = 
 
 CFIX=.c
-CFC= nvcc
-
-CFLAGS = -O2
+CFC = nvcc
+#CFC = gcc
+#GCC: CFLAGS = -O3 -funsafe-loop-optimizations -ftree-parallelize-loops=1024
+CFLAGS = -O3 -m 64
 
 #-----------------------------------------------------------------------
 # general rules
