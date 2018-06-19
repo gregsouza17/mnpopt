@@ -6,3 +6,4 @@ RMSDslw.dat
 *#
 *.o
 *.mod
+tst/lintst*

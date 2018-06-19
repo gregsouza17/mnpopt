@@ -551,11 +551,12 @@ type(universe)  , allocatable , intent(inout)  :: trj(:)
 type(universe)                , intent(out)    :: sys
 
 ! local variables ....
-real*8   , allocatable  :: xyz(:,:,:) , cost(:)
+real*8   , allocatable  :: xyz(:,:,:) , cost(:), linxyz(:)
 real*8                  :: soma, start, finish, ctime
 integer                 :: i , j , k , typical
 character(1)            :: answer
 logical  , allocatable  :: mask(:,:)
+integer, allocatable :: linmask(:)
 external Cslwcost !CCCCCCCCCCCCCCCCCCCC (Ccost.c or .cu)
 
 
@@ -597,22 +598,41 @@ allocate( cost(size(trj)) , source = 0.d0)
 
 ! this algorithm does the same thing twice as fast but it is twice as unclear ...
 
-open(unit=17, file = './tst/time.dat',position = 'append' , status='unknown')
+open(unit=17, file = './tst/lintstxyzF.dat', status='unknown')
 
-call cpu_time(start)
-cost = 0.d0
-call Cslwcost(trj(1)%N_of_atoms, size(trj), mask, xyz, cost, ctime)
-call cpu_time(finish)
-write(17,*) ""
-write(17,*) "Total C time elapsed:", (finish-start)
-write(17,*) "Loop C time elapsed (nvcc O3 m64):", ctime
-write(17,*) ""
+!lienarizing xyz(size Trj, N of atoms, 3) becomes
+!linxyz(i,j,k) = i + sizeTRJ*(j-1) + sizeTRJ*N*(k-1)
+allocate(linxyz(size(trj)*trj(1)%N_of_atoms*3))
+linxyz = reshape(xyz, (/size(trj)*trj(1)%N_of_atoms*3/))
 
-finish =0; start=0;
+
+!linearizing mask(N of atoms, 3) to linmask(i + N*(k-1))
+
+allocate(linmask(3*trj(1)%N_of_atoms))
+linmask = reshape(mask, (/3*trj(1)%N_of_atoms/))
+
+! do i=1,size(trj),207
+!    do j = 1,trj(1)%N_of_atoms,213
+!       do k = 1,3
+!          write(17,*) i,j,k, xyz(i,j,k),linxyz(i+size(trj)*((j-1)+ trj(1)%N_of_atoms*(k-1)))
+!       end do
+!    end do
+!  end do
+
+!call cpu_time(start)
+!cost = 0.d0
+!call Cslwcost(trj(1)%N_of_atoms, size(trj), mask, xyz, cost, ctime)
+!call cpu_time(finish)
+! write(17,*) ""
+! write(17,*) "Total C time elapsed:", (finish-start)
+! write(17,*) "Loop C time elapsed (nvcc O3 m64):", ctime
+! write(17,*) ""
+
+!finish =0; start=0;
 
 
 ! !$omp parallel do schedule(dynamic,300) default(shared) private(i1,i2,j,k,soma)
-call cpu_time(start)
+!call cpu_time(start)
 cost = 0.d0
 do i1 = 1 , size(trj)
     do i2 = 1 , size(trj)
@@ -629,9 +649,9 @@ do i1 = 1 , size(trj)
     end if
     end do
  end do
- call cpu_time(finish)
+ !call cpu_time(finish)
 
- write(17,*) "Fortran Loop Time: ", (finish - start)
+ !write(17,*) "Fortran Loop Time: ", (finish - start)
 !!$omp end parallel do
 
 
