@@ -32,3 +32,12 @@ Total C time elapsed:   326.581018000000
  Loop C time elapsed (nvcc O3 m64):   88.9536370000000     
  
  Fortran Loop Time:    25.6321860000000     
+ 
+ Total C (GPU -O3 32x32) time elapsed:  0.520423000000000     
+ 
+ 
+ Total C (GPU -O3 32x32) time elapsed:  0.514605000000000     
+ 
+ 
+ Total C (GPU -O3 32x32) time elapsed:  0.745953999999999     
+ 

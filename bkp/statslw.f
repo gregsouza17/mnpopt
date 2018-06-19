@@ -621,47 +621,46 @@ linmask = reshape(mask, (/3*trj(1)%N_of_atoms/))
 !    end do
 !  end do
 
-open(unit=17, file = './tst/time.dat', access= 'append', status='unknown')
-call cpu_time(start)
+!call cpu_time(start)
 cost = 0.d0
 call Cslwcost(trj(1)%N_of_atoms, size(trj), linmask, linxyz, cost, ctime)
-call cpu_time(finish)
-!write(17,*) ""
-!write(17,*) "Total C (GPU -O3 32x32) time elapsed:", (finish-start)
-!write(17,*) "Loop C time elapsed (nvcc O3 m64):", ctime
-!write(17,*) ""
+!call cpu_time(finish)
+! write(17,*) ""
+! write(17,*) "Total C time elapsed:", (finish-start)
+! write(17,*) "Loop C time elapsed (nvcc O3 m64):", ctime
+! write(17,*) ""
 
-finish =0; start=0;
+!finish =0; start=0;
 
 
 ! !$omp parallel do schedule(dynamic,300) default(shared) private(i1,i2,j,k,soma)
-! call cpu_time(start)
-! cost = 0.d0
-! do i1 = 1 , size(trj)
-!     do i2 = 1 , size(trj)
-!     if(i1/=i2) then
-!         soma = 0.d0
-!         do j = 1 , trj(1)%N_of_atoms
-!         do k = 1 , 3
+!call cpu_time(start)
+cost = 0.d0
+do i1 = 1 , size(trj)
+    do i2 = 1 , size(trj)
+    if(i1/=i2) then
+        soma = 0.d0
+        do j = 1 , trj(1)%N_of_atoms
+        do k = 1 , 3
 
-!             If( mask(j,k) ) soma = soma + (xyz(i1,j,k) - xyz(i2,j,k))*(xyz(i1,j,k) - xyz(i2,j,k))
+            If( mask(j,k) ) soma = soma + (xyz(i1,j,k) - xyz(i2,j,k))*(xyz(i1,j,k) - xyz(i2,j,k))
 
-!         end do
-!         end do
-!         cost(i1) = cost(i1) + soma
-!     end if
-!     end do
-!  end do
-!  call cpu_time(finish)
+        end do
+        end do
+        cost(i1) = cost(i1) + soma
+    end if
+    end do
+ end do
+ !call cpu_time(finish)
 
  !write(17,*) "Fortran Loop Time: ", (finish - start)
 !!$omp end parallel do
 
 
-! open(unit=17, file = './tst/F_RMSDCPU.dat', status='unknown')
-! do i1= 1, size(trj)
-!     write(17,*) i1,"   ", cost(i1)
-! end do
+open(unit=17, file = './tst/F_RMSDCPU.dat', status='unknown')
+do i1= 1, size(trj)
+    write(17,*) i1,"   ", cost(i1)
+end do
 
 !============================================================================================
 

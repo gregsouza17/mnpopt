@@ -7,14 +7,14 @@ FC = ifort
 SAFE = -g -traceback
 FFLAGS = -xhost -qopenmp -fpp -O3 -free $(SAFE)
 
-LIB    =  -liomp5
+LIB    =  -liomp5 -L /usr/local/cuda/lib -lcudart -lstdc++
 INCS   = 
 
-CFIX=.c
+CFIX=.cu
 CFC = nvcc
 #CFC = gcc
 #GCC: CFLAGS = -O3 -funsafe-loop-optimizations -ftree-parallelize-loops=1024
-CFLAGS = -O3 -m 64
+CFLAGS = -O3 -m 64 -x cu
 
 #-----------------------------------------------------------------------
 # general rules
@@ -38,9 +38,12 @@ SOURCE = types_m.o \
 		 multiple_trj.o \
 		 occupation_bin.o \
                  aminoacids.o \
-		 edview.o
+		 edview.o 
+
+
 
 CSOURCE = Ccostslow.o
+
 
 a: $(CSOURCE) $(SOURCE)  
 	rm -f a
@@ -54,7 +57,7 @@ a: $(CSOURCE) $(SOURCE)
 
 
 .c.o:
-	$(CFC) -c $(CFLAGS) $*$(CFIX)
+	$(CFC) $(CFLAGS) -c $*$(CFIX) 
 
 
 

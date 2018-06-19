@@ -19,20 +19,41 @@ void cslwcost_(int *N_atoms, int *Size_trj, int mask[3*(*N_atoms)],
 
     Output: Sums the costs of each position in xyz(:,:, i1) in the cost(i1)*/
   
+  int i1,i2,j,k;
+  int sizetrj = *Size_trj, Natoms = *N_atoms;
+  double soma;
+  clock_t t;
 
  
   
+  FILE *fp;
+  fp = fopen("tst/C_RMSDCPU.dat", "w+");
+
   // Test for xyz being passed corretclty from fortran to the C moduel
 
+  t = clock();
+  for (i1 = 0  ; i1 < *Size_trj  ; ++i1) {
+    for (i2 = 0;   i2< *Size_trj  ; ++i2) {
+      if(i1 != i2){
+	soma = 0;
+	for(j=0;   j<*N_atoms;   j++){
+	  for(k=0;   k<3;    k++){
 
+     if(  mask [j+Natoms*k] ){
+       soma+=
+       (xyz[i1+sizetrj*(j+k*Natoms)] - xyz[i2+sizetrj*(j+k*Natoms)])*
+	 (xyz[i1+sizetrj*(j+k*Natoms)] - xyz[i2+sizetrj*(j+k*Natoms)]);
+	     }
+	    
+	  } //for k
+	} //for j
+       	cost[i1]+=soma;
+      } //for if
+    } //for i2
+  } //for i1
 
-  
-  
-  /* FILE *fp; */
-  /* fp = fopen("tst/C_RMSDCPU.dat", "w+"); */
-
-  /* for(i1=0; i1<sizetrj; i1++) */
-  /*   fprintf(fp, "%d %f \n", i1, cost[i1]); */
+  for(i1=0; i1<sizetrj; i1++)
+    fprintf(fp, "%d %f \n", i1, cost[i1]);
 
 
 }
